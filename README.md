@@ -1,24 +1,43 @@
-# Arabic BiDi Engineering Agent Skill
+# مشروع مهارة هندسة اللغة العربية `arabic-bidi-engineering`
 
-This is an Agent Skill designed for AI coding assistants. It enforces mandatory rules for generating, formatting, or processing Arabic bidirectional (BiDi/RTL) documents across Word (.docx), Excel (.xlsx), PDF, HTML/CSS, and backend scripts.
+مهارة لوكلاء الذكاء الاصطناعي تجعلهم يكتبون العربية وينسقونها بشكل صحيح في المحادثة وفي المستندات والواجهات: الترقيم العربي، وعزل المصطلحات الإنجليزية، والاتجاه من اليمين لليسار في ملفات Word وExcel وPDF وHTML.
 
-By loading this skill, AI agents learn to correctly handle Arabic text layout and styling without relying on naive translation or default LTR conventions, avoiding common issues like inverted punctuation or broken tables.
+## هيكل المشروع
 
-## Installation / Usage
+| المجلد أو الملف | المحتوى |
+| --- | --- |
+| `skill/` | الإصدار الحالي القابل للتثبيت (`v2.0.0`)، وهو المجلد الذي ترتبط به كل الوكلاء |
+| `skill/SKILL.md` | الملف الأساسي: قواعد المحادثة، والقاعدة الجوهرية، وجدول التوجيه، وقائمة التحقق |
+| `skill/references/` | التفاصيل التقنية لكل مجال: Word وExcel وHTML/PDF ومعالجة النصوص |
+| `skill/scripts/check_arabic_text.py` | مدقق آلي لملفات Markdown وHTML وWord |
+| `versions/v1.0.0/` | الإصدار الأول الأصلي كما كان، محفوظ للرجوع إليه |
+| `CHANGELOG.md` | سجل التغييرات بين الإصدارات |
 
-Depending on your AI assistant, configure it to load `SKILL.md` from this directory.
+## أين تعمل المهارة الآن
 
-### Claude Code
-Add this directory to your Claude skills:
+كل المسارات التالية روابط رمزية تشير إلى `skill/` في هذا المجلد، فأي تعديل هنا يصل لكل الوكلاء فوراً:
+
+| الوكيل | المسار |
+| --- | --- |
+| Claude Code | `~/.claude/skills/arabic-bidi-engineering` |
+| المسار المشترك للوكلاء | `~/.agents/skills/arabic-bidi-engineering` |
+| Codex | `~/.codex/skills/arabic-bidi-engineering` |
+| Gemini CLI | `~/.gemini/skills/arabic-bidi-engineering` |
+| Antigravity | `~/.gemini/antigravity/skills/arabic-bidi-engineering` |
+| Copilot CLI | `~/.copilot/skills/arabic-bidi-engineering` |
+
+**تنبيه مهم:** لا تنقل هذا المجلد ولا تغيّر اسمه، فكل الروابط أعلاه تنكسر عندها.
+
+## الاستخدام السريع
+
+فحص ملف بالمدقق (يعيد رمز خروج 1 عند وجود مخالفات):
+
 ```bash
-cp -r . ~/.claude/skills/arabic-bidi-engineering
+python3 ~/Desktop/arabic-bidi-engineering/skill/scripts/check_arabic_text.py report.md
 ```
 
-### Cursor
-Create a rule in your `.cursor/rules` directory:
-```bash
-cp SKILL.md .cursor/rules/arabic-bidi-engineering.mdc
-```
+الرجوع إلى الإصدار الأول عبر `git`:
 
-### Codex / Gemini
-Reference the `SKILL.md` in your `AGENTS.md` or `GEMINI.md` system prompt guidelines, or include the contents directly in your project instructions.
+```bash
+git -C ~/Desktop/arabic-bidi-engineering show v1.0.0:SKILL.md
+```
