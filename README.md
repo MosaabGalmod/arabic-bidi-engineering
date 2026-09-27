@@ -1,3 +1,5 @@
+<div dir="rtl" align="right">
+
 # مشروع مهارة هندسة اللغة العربية `arabic-bidi-engineering`
 
 مهارة لوكلاء الذكاء الاصطناعي تجعلهم يكتبون العربية وينسقونها بشكل صحيح في المحادثة وفي المستندات والواجهات: الترقيم العربي، وعزل المصطلحات الإنجليزية، والاتجاه من اليمين لليسار في ملفات Word وExcel وPDF وHTML.
@@ -8,35 +10,55 @@
 
 شغّل الأمر التالي في الطرفية، وستظهر لك قوائم تفاعلية لاختيار الوكلاء، ونطاق التثبيت (المشروع الحالي أو كل المشاريع)، وطريقة التثبيت (ربط رمزي أو نسخ):
 
+</div>
+
 ```bash
 npx skills add MosaabGalmod/arabic-bidi-engineering
 ```
 
+<div dir="rtl" align="right">
+
 للتثبيت العام دون أسئلة لكل الوكلاء المكتشفة:
+
+</div>
 
 ```bash
 npx skills add MosaabGalmod/arabic-bidi-engineering -g -y
 ```
 
+<div dir="rtl" align="right">
+
 وللتحديث لاحقاً إلى آخر إصدار:
+
+</div>
 
 ```bash
 npx skills update
 ```
 
+<div dir="rtl" align="right">
+
 ### التثبيت اليدوي
 
 انسخ المستودع إلى جهازك:
+
+</div>
 
 ```bash
 git clone https://github.com/MosaabGalmod/arabic-bidi-engineering.git
 ```
 
+<div dir="rtl" align="right">
+
 ثم اربط مجلد `skill/` بمجلد المهارات لدى وكيلك. مثال لـ `Claude Code`:
+
+</div>
 
 ```bash
 ln -s "$PWD/arabic-bidi-engineering/skill" ~/.claude/skills/arabic-bidi-engineering
 ```
+
+<div dir="rtl" align="right">
 
 وللوكلاء الأخرى مثل `Cursor` و`Codex` و`Gemini` راجع ملف `skill/README.md`.
 
@@ -70,15 +92,23 @@ ln -s "$PWD/arabic-bidi-engineering/skill" ~/.claude/skills/arabic-bidi-engineer
 
 فحص ملف بالمدقق (يعيد رمز خروج 1 عند وجود مخالفات):
 
+</div>
+
 ```bash
 python3 ~/Desktop/arabic-bidi-engineering/skill/scripts/check_arabic_text.py report.md
 ```
 
+<div dir="rtl" align="right">
+
 الرجوع إلى الإصدار الأول عبر أمر `git` التالي:
+
+</div>
 
 ```bash
 git -C ~/Desktop/arabic-bidi-engineering show v1.0.0:SKILL.md
 ```
+
+<div dir="rtl" align="right">
 
 ## المساهمة
 
@@ -87,3 +117,5 @@ git -C ~/Desktop/arabic-bidi-engineering show v1.0.0:SKILL.md
 ## الترخيص
 
 المشروع منشور بترخيص `MIT`، والتفاصيل في ملف `LICENSE`.
+
+</div>
