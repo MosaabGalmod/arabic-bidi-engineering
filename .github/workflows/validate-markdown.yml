@@ -1,0 +1,32 @@
+name: Validate Markdown
+
+on:
+  push:
+    paths:
+      - '**.md'
+      - 'skill/scripts/check_arabic_text.py'
+      - '.github/workflows/validate-markdown.yml'
+  pull_request:
+    paths:
+      - '**.md'
+      - 'skill/scripts/check_arabic_text.py'
+      - '.github/workflows/validate-markdown.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run Arabic text validator
+        run: |
+          git ls-files -z '*.md' ':(exclude)versions/**' | xargs -0 -r python3 skill/scripts/check_arabic_text.py --

@@ -32,14 +32,14 @@ def normalize_arabic_for_search(text: str, unify_taa: bool = False, unify_yaa: b
     # Remove Tashkeel (diacritics) & Tatweel (kashida)
     text = re.sub(r'[\u064B-\u065F\u0670\u0640]', '', text)
     
-    # Unify Alef variations (أ, إ, آ, ٱ -> ا)
+    # Unify Alef variations to bare Alef
     text = re.sub(r'[إأآٱ]', 'ا', text)
     
-    # Unify Taa Marbuta (ة -> ه) - Optional
+    # Unify Taa Marbuta to Haa (optional)
     if unify_taa:
         text = re.sub(r'ة', 'ه', text)
         
-    # Unify Alef Maqsura / Yaa (ى -> ي) - Optional
+    # Unify Alef Maqsura to Yaa (optional)
     if unify_yaa:
         text = re.sub(r'ى', 'ي', text)
         
@@ -94,10 +94,10 @@ Modern JS engines support full Arabic locale formatting via the standard `Intl` 
 
 ### Punctuation Marks in Arabic Typography
 Always use native Arabic punctuation marks to ensure correct baseline alignment and font shaping:
-- **Arabic Comma**: `،` (`U+060C`) instead of English `,`.
-- **Arabic Semicolon**: `؛` (`U+061B`) instead of English `;`.
-- **Arabic Question Mark**: `؟` (`U+061F`) instead of English `?`.
-- **Arabic Quotations**: Use Guillemets `«` (`U+00AB`) and `»` (`U+00BB`) for Arabic quotations.
+- **Arabic Comma**: `،` `(U+060C)` instead of English `,`.
+- **Arabic Semicolon**: `؛` `(U+061B)` instead of English `;`.
+- **Arabic Question Mark**: `؟` `(U+061F)` instead of English `?`.
+- **Arabic Quotations**: Use Guillemets `«` `(U+00AB)` and `»` `(U+00BB)` for Arabic quotations.
 
 ### BiDi Control Characters (RLM & LRM)
 When neutral punctuation marks (such as `:`, `-`, `/`, `(`, `)`) appear between an Arabic word and an English/code term in generated documents, the Unicode BiDi algorithm may place the punctuation on the wrong side. Use Unicode marks to anchor them explicitly:
