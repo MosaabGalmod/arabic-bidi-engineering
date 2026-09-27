@@ -7,24 +7,96 @@ import zipfile
 import xml.etree.ElementTree as ET
 from typing import List, Tuple
 
+KNOWN_CLIS = {
+    'git', 'gh', 'npm', 'npx', 'pnpm', 'yarn', 'composer', 'php', 'artisan',
+    'python', 'python3', 'pip', 'cd', 'ls', 'cp', 'mv', 'rm', 'mkdir', 'ln',
+    'curl', 'wget', 'docker', 'sudo', 'bash', 'sh', 'node', 'cat', 'grep',
+    'find', 'chmod'
+}
+
 def has_arabic(text: str) -> bool:
     return bool(re.search(r'[\u0600-\u06FF]', text))
 
+def is_path_command_or_url(span: str) -> bool:
+    s = span.strip()
+    if s.startswith(('~/', '/', './', '../')):
+        return True
+    if '://' in s:
+        return True
+    tokens = s.split()
+    if tokens:
+        first = tokens[0].lower()
+        if first in KNOWN_CLIS:
+            return True
+        if '/' in s and any(re.match(r'^-{1,2}[a-zA-Z0-9]', t) for t in tokens[1:]):
+            return True
+    return False
+
 def check_markdown_txt(filepath: str) -> List[Tuple[int, str]]:
     findings = []
+    in_code_block = False
+    fence_char = None
+    fence_length = 0
+    bracket_pat = re.compile(r'\(\s*(?<!`)(`{1,2})(?!`)(.*?)(?<!`)\1(?!`)\s*\)|\[\s*(?<!`)(`{1,2})(?!`)(.*?)(?<!`)\3(?!`)\s*\](?!\()')
+
     with open(filepath, 'r', encoding='utf-8') as f:
         for i, line in enumerate(f, start=1):
             # Check for invisible BiDi control marks on ALL lines (not just Arabic lines)
             if re.search(r'[\u200E\u200F\u202A-\u202E\u2066-\u2069]', line):
                 findings.append((i, "[BIDI_CONTROL] Invisible BiDi control characters found. Do not use in chat/markdown."))
 
+            # Track fenced code blocks per CommonMark (indentation 0-3 spaces, same char, length >= opening)
+            if not in_code_block:
+                m_open = re.match(r'^[ ]{0,3}(`{3,}|~{3,})', line)
+                if m_open:
+                    fence = m_open.group(1)
+                    in_code_block = True
+                    fence_char = fence[0]
+                    fence_length = len(fence)
+                    continue
+            else:
+                m_close = re.match(r'^[ ]{0,3}(`{3,}|~{3,})\s*$', line)
+                if m_close:
+                    fence = m_close.group(1)
+                    if fence[0] == fence_char and len(fence) >= fence_length:
+                        in_code_block = False
+                        fence_char = None
+                        fence_length = 0
+                        continue
+
+            if in_code_block:
+                # [CODEBLOCK_ARABIC_COMMENT]: comment line containing Arabic letters inside code block
+                stripped = line.strip()
+                if stripped.startswith(('#', '//', '/*', '*', '<!--', '--')) and re.search(r'[\u0621-\u064A\u0671-\u06D5]', line):
+                    findings.append((i, "[CODEBLOCK_ARABIC_COMMENT] Arabic comment found inside code block. Code comments must be in English."))
+                continue
+
+            # Outside code blocks:
             if not has_arabic(line):
                 continue
-            
-            # Check for Latin punctuation adjacent to Arabic letters
+
+            # Skip counter-example lines that start (after optional whitespace/list marker) with ❌ or **Bad:**
+            stripped_lead = re.sub(r'^\s*(?:[-*+]\s+|\d+[.)]\s+)?', '', line)
+            if stripped_lead.startswith(('❌', '**Bad:**', 'Bad:')):
+                continue
+
+            # [BRACKET_OUTSIDE_BACKTICK]: pattern like (`x`) or [`x`] where a bracket directly wraps a backtick span
+            if bracket_pat.search(line):
+                findings.append((i, "[BRACKET_OUTSIDE_BACKTICK] Pattern like (`x`) or [`x`] found. Include brackets inside backticks: `(x)` or `[x]`."))
+
+            # [PUNCTUATION]: Latin punctuation adjacent to Arabic letters
             if re.search(r'[\u0600-\u06FF]\s*[,;\?]|[,;\?]\s*[\u0600-\u06FF]', line):
                 findings.append((i, "[PUNCTUATION] Latin punctuation (, ; ?) used near Arabic text. Use ، ؛ ؟ instead."))
-                
+
+            # [INLINE_PATH_END]: non-code-block line containing Arabic ending with path/command/URL backtick span
+            if not line.strip().startswith('|'):
+                clean_line = re.sub(r'[\s.:,;?!،؛؟\-\*]+$', '', line.rstrip())
+                m = re.search(r'(`+)([^`]+)\1$', clean_line)
+                if m:
+                    last_span = m.group(2).strip()
+                    if is_path_command_or_url(last_span):
+                        findings.append((i, f"[INLINE_PATH_END] Path, command, or URL (`{last_span}`) at end of Arabic line. Move to dedicated code block or table."))
+
     return findings
 
 def check_html(filepath: str) -> List[Tuple[int, str]]:
@@ -109,34 +181,47 @@ def check_docx(filepath: str) -> List[Tuple[int, str]]:
 
 def main():
     parser = argparse.ArgumentParser(description="Check files for Arabic engineering best practices.")
-    parser.add_argument("file", help="The file to check (.md, .txt, .html, .docx)")
+    parser.add_argument("files", nargs="+", help="Files to check (.md, .txt, .html, .docx)")
+    parser.add_argument("--warn-only", action="store_true", help="Only warn; do not exit with error code 1 on findings.")
     args = parser.parse_args()
     
-    filepath = args.file
-    if not os.path.isfile(filepath):
-        print(f"Error: File '{filepath}' not found.")
+    total_findings = 0
+    file_errors = 0
+    for filepath in args.files:
+        if not os.path.isfile(filepath):
+            print(f"Error: File '{filepath}' not found.")
+            file_errors += 1
+            continue
+            
+        ext = os.path.splitext(filepath)[1].lower()
+        findings = []
+        try:
+            if ext in ['.md', '.txt']:
+                findings = check_markdown_txt(filepath)
+            elif ext in ['.html', '.htm']:
+                findings = check_html(filepath)
+            elif ext == '.docx':
+                findings = check_docx(filepath)
+            else:
+                print(f"Unsupported file extension '{ext}' for {filepath}")
+                continue
+        except Exception as e:
+            print(f"Error reading '{filepath}': {e}")
+            file_errors += 1
+            continue
+            
+        if findings:
+            total_findings += len(findings)
+            for line_num, msg in findings:
+                print(f"{filepath}:{line_num}: {msg}")
+        else:
+            print(f"No issues found in {filepath}")
+            
+    if file_errors > 0:
         sys.exit(1)
-        
-    ext = os.path.splitext(filepath)[1].lower()
-    
-    findings = []
-    if ext in ['.md', '.txt']:
-        findings = check_markdown_txt(filepath)
-    elif ext in ['.html', '.htm']:
-        findings = check_html(filepath)
-    elif ext == '.docx':
-        findings = check_docx(filepath)
-    else:
-        print(f"Unsupported file extension '{ext}'")
-        sys.exit(0)
-        
-    if findings:
-        for line_num, msg in findings:
-            print(f"{filepath}:{line_num}: {msg}")
+    if total_findings > 0 and not args.warn_only:
         sys.exit(1)
-    else:
-        print(f"No issues found in {filepath}")
-        sys.exit(0)
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()

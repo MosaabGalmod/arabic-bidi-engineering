@@ -32,7 +32,7 @@ Always declare `<html lang="ar" dir="rtl">` on the root. For user-generated or d
     /* 3. Code & English Isolation inside Arabic prose */
     code, pre, .font-mono {
       direction: ltr;
-      text-align: left;
+      text-align: start;
       unicode-bidi: isolate;
       font-family: 'Consolas', 'Fira Code', monospace;
     }
@@ -53,6 +53,10 @@ Always declare `<html lang="ar" dir="rtl">` on the root. For user-generated or d
     th.amount, td.amount {
       text-align: end; /* Financial totals and currencies */
       font-variant-numeric: tabular-nums;
+    }
+    th.code, td.code, th.ltr, td.ltr {
+      direction: ltr;
+      text-align: start; /* Codes, URLs & LTR Data: text-start with dir="ltr" */
     }
 
     /* 5. Print & PDF Pagination Rules */
@@ -129,7 +133,7 @@ await page.pdf({
 <!-- Tailwind Logical Properties Snippet -->
 <div class="flex items-center gap-4 p-4">
   <div class="ms-4 me-2 ps-3 pe-6 border-s-4 border-blue-700 text-start">
-    <p class="text-sm text-slate-600 rtl:text-right ltr:text-left">
+    <p class="text-sm text-slate-600 text-start">
       نص عربي مع زر توجيهي:
     </p>
   </div>
@@ -148,6 +152,8 @@ await page.pdf({
       <th class="py-3 px-4 text-center w-24">الكمية</th>
       <!-- 3. Financial amounts end-aligned -->
       <th class="py-3 ps-2 pe-4 text-end w-36">المجموع الإجمالي</th>
+      <!-- 4. Codes, URLs & LTR Data: text-start with dir="ltr" -->
+      <th class="py-3 ps-2 pe-4 text-start w-40" dir="ltr">Endpoint</th>
     </tr>
   </thead>
   <tbody class="divide-y divide-slate-100 text-sm">
@@ -161,6 +167,10 @@ await page.pdf({
       <!-- Numeric amount cell: text-end -->
       <td class="py-3 ps-2 pe-4 text-end font-mono font-bold text-slate-900">
         5,200.00 ر.س
+      </td>
+      <!-- Codes, URLs & LTR cell: text-start with dir="ltr" -->
+      <td class="py-3 ps-2 pe-4 text-start font-mono text-xs text-slate-500" dir="ltr">
+        /api/v1/analytics
       </td>
     </tr>
   </tbody>

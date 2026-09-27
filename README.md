@@ -6,7 +6,7 @@
 
 | المجلد أو الملف | المحتوى |
 | --- | --- |
-| `skill/` | الإصدار الحالي القابل للتثبيت (`v2.0.0`)، وهو المجلد الذي ترتبط به كل الوكلاء |
+| `skill/` | الإصدار الحالي القابل للتثبيت `(v2.1.0)`، وهو المجلد الذي ترتبط به كل الوكلاء |
 | `skill/SKILL.md` | الملف الأساسي: قواعد المحادثة، والقاعدة الجوهرية، وجدول التوجيه، وقائمة التحقق |
 | `skill/references/` | التفاصيل التقنية لكل مجال: Word وExcel وHTML/PDF ومعالجة النصوص |
 | `skill/scripts/check_arabic_text.py` | مدقق آلي لملفات Markdown وHTML وWord |
@@ -36,7 +36,7 @@
 python3 ~/Desktop/arabic-bidi-engineering/skill/scripts/check_arabic_text.py report.md
 ```
 
-الرجوع إلى الإصدار الأول عبر `git`:
+الرجوع إلى الإصدار الأول عبر أمر `git` التالي:
 
 ```bash
 git -C ~/Desktop/arabic-bidi-engineering show v1.0.0:SKILL.md

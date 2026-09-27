@@ -28,8 +28,9 @@ def create_rtl_excel_workbook():
 
 ## 2. Complete Styling & Explicit Alignment
 
-Do not rely on default or implicit alignments. Apply explicit center/right alignment based on content type.
-**Note on `isdigit()`:** In Python, `str.isdigit()` returns `True` for Arabic-Indic digits (`٠-٩`). Use an explicit Western numeric regex to avoid accidental center alignment of Arabic numbers when unexpected.
+Do not rely on default or implicit alignments. Apply explicit center/right alignment based on content type:
+- **Table Cells Alignment Rule:** Center only numeric/metric values (Western or Arabic-Indic digits, percentages, signed/decimal numbers, short Latin codes); any value containing Arabic letters MUST be strictly right-aligned.
+- Headers of text columns containing Arabic letters must be right-aligned as well.
 
 ```python
 def style_rtl_worksheet(ws):
@@ -56,8 +57,13 @@ def style_rtl_worksheet(ws):
             for cell in row:
                 cell.font = header_font
                 cell.fill = header_fill
-                cell.alignment = align_center
                 cell.border = thin_border
+                val_str = str(cell.value or '').strip()
+                # Headers of text columns right-aligned; metric/ID/code headers centered
+                if re.search(r'[\u0621-\u064A\u0671-\u06D5]', val_str):
+                    cell.alignment = align_right
+                else:
+                    cell.alignment = align_center
         else:
             ws.row_dimensions[row_idx].height = 24
             is_even = (row_idx % 2 == 0)
@@ -68,11 +74,14 @@ def style_rtl_worksheet(ws):
                     cell.fill = zebra_fill
                 
                 # Explicit alignment heuristic:
-                # Center numeric values (supporting signs, thousands separators, decimals, and percent)
-                # as well as short single-token metric codes. Right-align Arabic narrative text.
+                # Center only numeric/metric values (Western or Arabic-Indic digits, percentages,
+                # signed/decimal numbers, short Latin codes); any value containing Arabic letters is right-aligned.
                 val_str = str(cell.value or '').strip()
-                if (re.match(r'^[+-]?(?:[0-9]{1,3}(?:,[0-9]{3})+|[0-9]+)(?:\.[0-9]+)?%?$', val_str) or 
-                    (len(val_str) <= 12 and ' ' not in val_str)):
+                has_arabic_letters = bool(re.search(r'[\u0621-\u064A\u0671-\u06D5]', val_str))
+                is_numeric = bool(re.match(r'^[+-]?(?:(?:[0-9٠-٩]{1,3}(?:[,٬][0-9٠-٩]{3})+|[0-9٠-٩]+)(?:[\.٫][0-9٠-٩]+)?|[\.٫][0-9٠-٩]+)(?:[eE][+-]?[0-9٠-٩]+)?%?٪?$', val_str))
+                is_latin_code = bool(re.match(r'^[A-Za-z0-9_#-]{1,12}$', val_str))
+                
+                if not has_arabic_letters and (is_numeric or is_latin_code):
                     cell.alignment = align_center
                 else:
                     cell.alignment = align_right
