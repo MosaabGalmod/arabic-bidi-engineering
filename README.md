@@ -2,6 +2,22 @@
 
 مهارة لوكلاء الذكاء الاصطناعي تجعلهم يكتبون العربية وينسقونها بشكل صحيح في المحادثة وفي المستندات والواجهات: الترقيم العربي، وعزل المصطلحات الإنجليزية، والاتجاه من اليمين لليسار في ملفات Word وExcel وPDF وHTML.
 
+## التثبيت
+
+انسخ المستودع إلى جهازك:
+
+```bash
+git clone https://github.com/MosaabGalmod/arabic-bidi-engineering.git
+```
+
+ثم اربط مجلد `skill/` بمجلد المهارات لدى وكيلك. مثال لـ `Claude Code`:
+
+```bash
+ln -s "$PWD/arabic-bidi-engineering/skill" ~/.claude/skills/arabic-bidi-engineering
+```
+
+وللوكلاء الأخرى مثل `Cursor` و`Codex` و`Gemini` راجع ملف `skill/README.md`.
+
 ## هيكل المشروع
 
 | المجلد أو الملف | المحتوى |
@@ -41,3 +57,11 @@ python3 ~/Desktop/arabic-bidi-engineering/skill/scripts/check_arabic_text.py rep
 ```bash
 git -C ~/Desktop/arabic-bidi-engineering show v1.0.0:SKILL.md
 ```
+
+## المساهمة
+
+البلاغات والاقتراحات مرحب بها عبر صفحة `Issues` في المستودع، وقبل إرسال أي تعديل شغّل المدقق على الملفات المعدلة.
+
+## الترخيص
+
+المشروع منشور بترخيص `MIT`، والتفاصيل في ملف `LICENSE`.
