@@ -15,6 +15,7 @@ When communicating in Arabic or generating Markdown containing Arabic, these rul
 4. **No Invisible BiDi Controls in Chat**: Never insert invisible RLM/LRM (`U+200F` / `U+200E`) or directional formatting marks in chat text or Markdown — they corrupt copy/paste, terminal rendering, and code execution. Use them *only* in compiled documents (PDF canvas, Word XML).
 5. **Paragraph Direction Anchor**: Avoid starting a line or bullet point with a Latin word or number. In many Markdown renderers, the first strong character determines paragraph direction.
 6. **Western Digits by Default**: Use Western digits (`0-9`) by default in technical documentation and chat text unless explicitly asked otherwise.
+7. **Strict LTR for Code Blocks**: Multi-line code blocks (```...```) MUST always be strictly LTR and left-aligned. Code comments inside code blocks should be English to avoid BiDi inversion of brackets (`{}`, `[]`), semicolons, and indentation. In chat/Markdown, never wrap code blocks inside `<div dir="rtl">`; keep code blocks strictly in their natural LTR direction.
 
 **Example:**
 - ❌ **Bad:** لا تقم بتشغيل (server) الآن, انتظر لـ v1.2?
