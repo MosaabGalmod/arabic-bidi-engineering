@@ -16,6 +16,9 @@ When communicating in Arabic or generating Markdown containing Arabic, these rul
 5. **Paragraph Direction Anchor**: Avoid starting a line or bullet point with a Latin word or number. In many Markdown renderers, the first strong character determines paragraph direction.
 6. **Western Digits by Default**: Use Western digits (`0-9`) by default in technical documentation and chat text unless explicitly asked otherwise.
 7. **Strict LTR for Code Blocks**: Multi-line code blocks (```...```) MUST always be strictly LTR and left-aligned. Code comments inside code blocks should be English to avoid BiDi inversion of brackets (`{}`, `[]`), semicolons, and indentation. In chat/Markdown, never wrap code blocks inside `<div dir="rtl">`; keep code blocks strictly in their natural LTR direction.
+8. **Standalone Paths & LTR List Items**: Never place bare file paths, URLs, or commands as naked RTL bullet points (e.g. `- \`~/.path\`` inside an RTL container), as this flips the leading tilde/slashes and forces unnatural right-alignment. Either:
+   - Anchor the bullet point with Arabic text first (e.g. `- مسار الوكلاء: \`~/.agents/...\``).
+   - Or isolate the list in a dedicated LTR block (`<div dir="ltr">` or code block) so the bullet points and paths are naturally left-aligned (`text-align: left;`).
 
 **Example:**
 - ❌ **Bad:** لا تقم بتشغيل (server) الآن, انتظر لـ v1.2?
