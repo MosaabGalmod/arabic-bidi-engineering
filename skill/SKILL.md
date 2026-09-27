@@ -16,11 +16,11 @@ When communicating in Arabic or generating Markdown containing Arabic, these rul
 5. **Paragraph Direction Anchor**: Avoid starting a line or bullet point with a Latin word or number. In many Markdown renderers, the first strong character determines paragraph direction.
 6. **Western Digits by Default**: Use Western digits `(0-9)` by default in technical documentation and chat text unless explicitly asked otherwise.
 7. **Strict LTR & English Comments for Code Blocks**: Multi-line code blocks (```...```) MUST always be strictly LTR and left-aligned. The ban on Arabic applies to comments and explanatory text inside code blocks in chat and Markdown replies (comments inside code must be in English; Arabic prose explanations go outside the block as standard RTL paragraphs). Arabic string literals, UI text, translation values, and sample data inside real code (HTML, PHP, Python, JSON) are ALLOWED and expected. In chat/Markdown, never wrap code blocks inside `<div dir="rtl">`.
-8. **File Paths & Commands Isolation**: Full file paths, terminal commands, and URLs MUST NEVER be appended inline at the end of Arabic sentences or bullet points (e.g. `مسار: ~/.path` is strictly forbidden because neutral colons `:` and leading symbols `~/` collide and render paths unreadable). Always place full paths and commands on a separate line as a dedicated LTR code block (```bash...```), ensuring 100% left-alignment, natural reading order, and clean one-click copying. Note: A short file name or identifier in backticks mid-sentence is fine; Markdown tables may also contain paths in backtick cells.
+8. **File Paths & Commands Isolation**: Full file paths, terminal commands, and URLs MUST NEVER be appended inline at the end of Arabic sentences or bullet points (e.g. `مسار: ~/.path` is strictly forbidden because neutral colons `:` and leading symbols `~/` collide and render paths unreadable). Always place full paths and commands on a separate line as a dedicated LTR code block (```bash...```), ensuring 100% left-alignment, natural reading order, and clean one-click copying. Note: A short file name or identifier in backticks mid-sentence is fine; Markdown tables may also contain paths in backtick cells (inside an RTL HTML wrapper on GitHub, paths or code spans with neutral edges need `<code dir="ltr">` to prevent visual reordering).
 
 **Example:**
-- ❌ **Bad:** لا تقم بتشغيل (server) الآن, انتظر لـ v1.2?
-- ✅ **Good:** لا تقم بتشغيل `(server)` الآن، انتظر لـ `v1.2`؟
+- ❌ **خطأ (`Bad`):** لا تقم بتشغيل (server) الآن, انتظر لـ v1.2?
+- ✅ **صحيح `(Good)`:** لا تقم بتشغيل `(server)` الآن، انتظر لـ `v1.2`؟
 
 ## 1. When NOT to Apply
 Do NOT apply Arabic BiDi rules or translations to:
@@ -36,7 +36,7 @@ Handling Arabic and bidirectional (BiDi) text requires strict separation between
 
 **Rule:** Every RTL block (paragraph, table cell, or container) MUST have **both** an RTL direction explicitly declared **and** an explicit right alignment (or center for metrics/titles). Relying on one without the other causes layout displacement across Office, LibreOffice, and PDF engines.
 
-### Table Cells Alignment Rule (إلزامية محاذاة نصوص الجداول نحو اليمين)
+### إلزامية محاذاة نصوص الجداول نحو اليمين `(Table Cells Alignment Rule)`
 In all table implementations across all platforms (HTML/CSS, Word .docx, Excel .xlsx, PDF):
 1. **Arabic Text, Prose & Descriptions**: ALL textual headers (`th`), item names, descriptions, and narrative cells MUST be strictly **aligned to the right** (`text-align: right` / `text-start`, `<w:jc w:val="right"/>`, `Alignment(horizontal='right')`). Centering or left-aligning Arabic prose, descriptions, or names inside table cells is strictly forbidden.
 2. **Numeric & Metric Cells**: Only quantitative metrics (IDs, counts, percentages, status badges, serial numbers) may be centered (`text-center` / `align_center`) or aligned to the end for financial amounts (`text-end`).
@@ -61,7 +61,7 @@ For deep technical patterns and complete code implementations, refer to the doma
 
 ## 5. Release Checklist
 Before concluding any Arabic text, document generation, or UI task:
-- [ ] **Validator**: Run `python3 scripts/check_arabic_text.py <file>` to detect punctuation or direction anomalies.
+- [ ] **Validator**: Run `python3 scripts/check_arabic_text.py <file>` to detect punctuation, direction anomalies, naked Latin words (`[NAKED_LATIN]`), or LTR line starts (`[LATIN_LINE_START]`).
 - [ ] **Chat/Markdown**: Follows Section 0 (backticks on code/Latin, native `،` `؛` `؟`, no invisible bidi marks).
 - [ ] **Word (.docx)**: Section has `<w:bidi/>`, `Normal` style has `<w:bidi/>` + `<w:jc w:val="right"/>`, tables have `<w:bidiVisual/>`, and cells have right alignment.
 - [ ] **Word (.docx)**: English words and bracketed expressions are wrapped in isolated LTR runs (`w:rtl val="0"`).
