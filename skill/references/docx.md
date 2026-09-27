@@ -11,6 +11,7 @@ In OpenXML (ECMA-376) and Microsoft Word:
 When creating RTL tables:
 - `<w:bidiVisual/>` is **mandatory** on table properties (`tblPr`) so Column 0 renders on the far right.
 - Note: `<w:bidiVisual/>` only affects visual column order; it does **not** align paragraph text within cells. Each cell paragraph still requires explicit `<w:jc w:val="right"/>` and `<w:bidi/>`.
+- **Table Cells Alignment Rule:** All textual headers, item names, and Arabic descriptions inside table cells MUST have `<w:jc w:val="right"/>`. Never center or left-align Arabic narrative text. Only short numeric IDs, dates, or quantitative metric codes may use `<w:jc w:val="center"/>`.
 
 ## Schema-Order & Idempotent XML Insertion
 Blindly calling `.append()` on OpenXML elements causes duplicate tags and ECMA-376 child-order violations (e.g., placing `<w:bidi/>` after `<w:jc/>` in `w:pPr`, or appending `w:bidi` at the end of `w:sectPr`), triggering Word repair warnings.

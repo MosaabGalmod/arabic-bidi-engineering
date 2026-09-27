@@ -37,7 +37,25 @@ Always declare `<html lang="ar" dir="rtl">` on the root. For user-generated or d
       font-family: 'Consolas', 'Fira Code', monospace;
     }
 
-    /* 4. Print & PDF Pagination Rules */
+    /* 4. Table Arabic Alignment Rules */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      direction: rtl;
+    }
+    th, td {
+      text-align: right; /* Mandatory: All Arabic headers and text cells strictly right-aligned */
+      vertical-align: middle;
+    }
+    th.metric, td.metric {
+      text-align: center; /* Quantitative metrics, counts, and status codes */
+    }
+    th.amount, td.amount {
+      text-align: end; /* Financial totals and currencies */
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* 5. Print & PDF Pagination Rules */
     @page {
       size: A4;
       margin: 15mm 15mm 20mm 15mm;
@@ -119,6 +137,34 @@ await page.pdf({
     تأكيد
   </button>
 </div>
+
+<!-- Tailwind Table RTL Alignment Pattern -->
+<table class="w-full text-start border-collapse">
+  <thead>
+    <tr class="border-b border-slate-200 text-xs font-bold text-slate-600">
+      <!-- 1. Textual headers MUST be text-start (right in RTL) -->
+      <th class="py-3 ps-4 pe-2 text-start">البند / وصف الخدمة</th>
+      <!-- 2. Metric headers centered -->
+      <th class="py-3 px-4 text-center w-24">الكمية</th>
+      <!-- 3. Financial amounts end-aligned -->
+      <th class="py-3 ps-2 pe-4 text-end w-36">المجموع الإجمالي</th>
+    </tr>
+  </thead>
+  <tbody class="divide-y divide-slate-100 text-sm">
+    <tr>
+      <!-- Narrative text cell: strictly text-start -->
+      <td class="py-3 ps-4 pe-2 text-start font-medium text-slate-800">
+        تطوير لوحة تحكم المنصة الموحدة مع تقارير التحليلات
+      </td>
+      <!-- Quantitative metric cell: centered -->
+      <td class="py-3 px-4 text-center font-mono">1</td>
+      <!-- Numeric amount cell: text-end -->
+      <td class="py-3 ps-2 pe-4 text-end font-mono font-bold text-slate-900">
+        5,200.00 ر.س
+      </td>
+    </tr>
+  </tbody>
+</table>
 ```
 
 ## 4. Multi-Engine PDF Generation

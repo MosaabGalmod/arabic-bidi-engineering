@@ -34,6 +34,12 @@ Handling Arabic and bidirectional (BiDi) text requires strict separation between
 
 **Rule:** Every RTL block (paragraph, table cell, or container) MUST have **both** an RTL direction explicitly declared **and** an explicit right alignment (or center for metrics/titles). Relying on one without the other causes layout displacement across Office, LibreOffice, and PDF engines.
 
+### Table Cells Alignment Rule (إلزامية محاذاة نصوص الجداول نحو اليمين)
+In all table implementations across all platforms (HTML/CSS, Word .docx, Excel .xlsx, PDF):
+1. **Arabic Text, Prose & Descriptions**: ALL textual headers (`th`), item names, descriptions, and narrative cells MUST be strictly **aligned to the right** (`text-align: right` / `text-start`, `<w:jc w:val="right"/>`, `Alignment(horizontal='right')`). Centering or left-aligning Arabic prose, descriptions, or names inside table cells is strictly forbidden.
+2. **Numeric & Metric Cells**: Only quantitative metrics (IDs, counts, percentages, status badges, serial numbers) may be centered (`text-center` / `align_center`) or aligned to the end for financial amounts (`text-end`).
+3. **Codes, URLs & LTR Data**: Technical codes, IBANs, phone numbers, and URLs inside table cells must be isolated and left-aligned (`text-start` with `dir="ltr"` or `text-left`).
+
 ## 3. Digits & Dates Policy
 - **Digits**: Use Western digits (`0-9`) by default in technical docs, code comments, and chat. Use Arabic-Indic digits (`٠-٩`) only when a specific regional locale or client standard explicitly requires them.
 - **Hijri Dates**: Format Islamic dates using the Umm al-Qura calendar via the Intl API:
@@ -59,4 +65,5 @@ Before concluding any Arabic text, document generation, or UI task:
 - [ ] **Word (.docx)**: English words and bracketed expressions are wrapped in isolated LTR runs (`w:rtl val="0"`).
 - [ ] **Excel (.xlsx)**: Worksheets have `ws.sheet_view.rightToLeft = True` (with `ws.views.sheetView[0]` guarded), and columns auto-fitted with the 1.2x Arabic factor.
 - [ ] **PDF/HTML**: Root has `<html lang="ar" dir="rtl">`, code blocks use `unicode-bidi: isolate;`, and layout uses CSS logical properties.
+- [ ] **Tables (All Formats)**: Text headers (`th`), descriptions, and narrative Arabic cells are explicitly right-aligned (never centered or left-aligned).
 - [ ] **Email**: Explicit `dir="rtl"` and `align="right"` attributes on `<table>` and `<td>` tags.
