@@ -38,6 +38,60 @@ npx skills update
 
 <div dir="rtl" align="right">
 
+### تطبيق `Antigravity`
+
+المهارة وحدها لا تكفي لـ `Antigravity`؛ فأداة `skills` (الإصدار <code dir="ltr">1.7.0</code>) تضع مهارات `Antigravity` العامة في
+<code dir="ltr">~/.agents/skills/</code>
+وهو مجلد لا يقرأه `Antigravity`، كما يحتاج الوكيل إلى وجود المهارة في مجلده العام المعتمد
+<code dir="ltr">~/.gemini/config/skills/</code>
+(ومجلد التوافق <code dir="ltr">~/.gemini/antigravity/skills/</code>)
+وإلى قاعدة دائمة في
+<code dir="ltr">~/.gemini/GEMINI.md</code>
+لضمان تفعيلها دائماً في كل محادثة حتى على أجهزة التثبيت الجديدة.
+السكريبت أدناه يقوم بالتثبيت والنسخ التلقائي وإضافة القاعدة في أمر واحد وهو آمن للتشغيل المتكرر.
+
+</div>
+
+```powershell
+# Windows
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MosaabGalmod/arabic-bidi-engineering/main/install/antigravity.ps1)))
+```
+
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/MosaabGalmod/arabic-bidi-engineering/main/install/antigravity.sh | bash
+```
+
+<div dir="rtl" align="right">
+
+ولإلغاء التثبيت وحذف مجلد المهارة والقاعدة الدائمة، شغّل أمر الإلغاء لنظامك:
+
+</div>
+
+```powershell
+# Windows
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MosaabGalmod/arabic-bidi-engineering/main/install/antigravity.ps1))) -Uninstall
+```
+
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/MosaabGalmod/arabic-bidi-engineering/main/install/antigravity.sh | bash -s -- --uninstall
+```
+
+<div dir="rtl" align="right">
+
+أو مباشرةً عبر أداة `skills` فقط (دون إضافة القاعدة الدائمة ودون النسخ إلى مجلد `Antigravity`):
+
+</div>
+
+```bash
+npx skills add MosaabGalmod/arabic-bidi-engineering -g -a antigravity --copy -y
+```
+
+<div dir="rtl" align="right">
+
+**ملاحظة:** لتحديث المهارة لاحقاً لـ `Antigravity`، أعد تشغيل أمر التثبيت أعلاه (فهو يجدد نسخة مجلد `Antigravity`).
+
 ### التثبيت اليدوي
 
 انسخ المستودع إلى جهازك:
@@ -70,6 +124,7 @@ ln -s "$PWD/arabic-bidi-engineering/skill" ~/.claude/skills/arabic-bidi-engineer
 | `skill/SKILL.md` | الملف الأساسي: قواعد المحادثة، والقاعدة الجوهرية، وجدول التوجيه، وقائمة التحقق |
 | <code dir="ltr">skill/references/</code> | التفاصيل التقنية لكل مجال: `Word` و`Excel` و`HTML/PDF` ومعالجة النصوص |
 | `skill/scripts/check_arabic_text.py` | مدقق آلي لملفات `Markdown` و`HTML` و`Word` |
+| <code dir="ltr">install/</code> | سكريبتا التثبيت التلقائي لـ `Antigravity`: <code dir="ltr">antigravity.ps1</code> لـ `Windows` و<code dir="ltr">antigravity.sh</code> لـ `Linux/macOS` |
 | <code dir="ltr">versions/v1.0.0/</code> | الإصدار الأول الأصلي كما كان، محفوظ للرجوع إليه |
 | `CHANGELOG.md` | سجل التغييرات بين الإصدارات |
 

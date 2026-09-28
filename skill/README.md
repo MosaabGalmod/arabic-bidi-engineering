@@ -32,6 +32,29 @@ To update later to the latest version:
 npx skills update
 ```
 
+### Antigravity (one-command installer)
+
+Antigravity loads global skills from its config folder (`~/.gemini/config/skills/`, mirrored also to `~/.gemini/antigravity/skills/` for compatibility) and needs a
+permanent rule in `~/.gemini/GEMINI.md` to stay always-on across fresh installs.
+Because the `skills` CLI (1.7.0) installs Antigravity global skills to `~/.agents/skills/` (which Antigravity does not read),
+the scripts below run the installer and mirror the skill into Antigravity's folders automatically:
+
+```powershell
+# Windows
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MosaabGalmod/arabic-bidi-engineering/main/install/antigravity.ps1)))
+```
+
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/MosaabGalmod/arabic-bidi-engineering/main/install/antigravity.sh | bash
+```
+
+To update the skill later, re-run the installer command above (it refreshes the Antigravity copy).
+
+To uninstall (removes the Antigravity skill directory and the permanent rule):
+- On Windows: `& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MosaabGalmod/arabic-bidi-engineering/main/install/antigravity.ps1))) -Uninstall`
+- On Linux/macOS: `curl -fsSL https://raw.githubusercontent.com/MosaabGalmod/arabic-bidi-engineering/main/install/antigravity.sh | bash -s -- --uninstall`
+
 ### Manual Installation (Alternative)
 
 Depending on your AI assistant, configure it to load `SKILL.md` from this directory.
