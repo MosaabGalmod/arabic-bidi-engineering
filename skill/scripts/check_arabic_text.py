@@ -395,7 +395,36 @@ def check_docx(filepath: str) -> List[Tuple[int, str]]:
                         if not valid_jc:
                             reasons.append(f"invalid/missing w:jc (val='{jc_val}', expected 'right', 'end', or 'center')")
                         findings.append((0, f"[DOCX_PARAGRAPH] Arabic paragraph '{preview}...' has {' and '.join(reasons)}."))
-                        
+
+                    # Check maximal sequences of consecutive LTR runs (w:rtl val="0" or "false")
+                    curr_ltr_runs: List[str] = []
+
+                    def check_ltr_seq(accum: List[str]) -> None:
+                        if not accum:
+                            return
+                        seq_text = "".join(accum)
+                        opens = seq_text.count('(') + seq_text.count('[') + seq_text.count('{')
+                        closes = seq_text.count(')') + seq_text.count(']') + seq_text.count('}')
+                        if opens != closes:
+                            findings.append((0, f"[DOCX_SPLIT_BRACKET] LTR run holds an unpaired bracket: '{seq_text}' — keep brackets in the Arabic run or include both."))
+
+                    for r in p.findall('.//w:r', ns):
+                        rPr = r.find('w:rPr', ns)
+                        is_ltr = False
+                        if rPr is not None:
+                            rtl_elem = rPr.find('w:rtl', ns)
+                            if rtl_elem is not None:
+                                rtl_val = rtl_elem.attrib.get(f"{{{ns['w']}}}val", 'true')
+                                if rtl_val in ('0', 'false'):
+                                    is_ltr = True
+                        if is_ltr:
+                            run_text = ''.join(t.text for t in r.findall('w:t', ns) if t.text)
+                            curr_ltr_runs.append(run_text)
+                        else:
+                            check_ltr_seq(curr_ltr_runs)
+                            curr_ltr_runs = []
+                    check_ltr_seq(curr_ltr_runs)
+
             # Check Tables
             for tbl in root.findall('.//w:tbl', ns):
                 tbl_text = "".join(t.text for t in tbl.findall('.//w:t', ns) if t.text)

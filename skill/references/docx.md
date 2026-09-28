@@ -235,23 +235,35 @@ def add_mixed_arabic_english(builder: BiDiDocxBuilder, paragraph, text: str) -> 
     """
     Splits text on English words, multi-word Latin spans (e.g. 'Meta Description', '200 OK'),
     programming terms with symbols (e.g. 'C++', 'C#'), emails, URLs with query strings,
-    bracketed expressions (e.g. '(Meta)'), single characters, or numbers, outputting isolated runs.
+    bracketed expressions (e.g. '(DGA)'), single characters, or numbers, outputting isolated runs.
+    A bracket is included in an LTR run only when both the opening and closing bracket are
+    present around the token (balanced pair, e.g. '(DGA)'); a lone bracket stays in the Arabic run.
+    '%' stays attached to its number inside the LTR run.
     """
     # Includes @ + # & ? % = so C++, C#, emails, query strings stay one LTR run.
     # Excludes trailing dot from absorbing sentence-ending punctuation.
-    token_pattern = (
-        r'([\[\(\{]?'
-        r'[a-zA-Z0-9_\-\.\:\/\<\>\=\"@\+\#\&\?\%=]*[a-zA-Z0-9][a-zA-Z0-9_\-\.\:\/\<\>\=\"@\+\#\&\?\%=]*'
+    # Brackets enter an LTR run only as a balanced pair enclosing the token;
+    # never split a bracket pair across an LTR run and an RTL run.
+    _CORE = (
+        r'[a-zA-Z0-9_\-\.\/\:<>=\"@\+\#\&\?\%]*[a-zA-Z0-9][a-zA-Z0-9_\-\.\/\:<>=\"@\+\#\&\?\%]*'
         r'(?<!\.)'
-        r'(?:[ \t]+[a-zA-Z0-9_\-\.\:\/\<\>\=\"@\+\#\&\?\%=]*[a-zA-Z0-9][a-zA-Z0-9_\-\.\:\/\<\>\=\"@\+\#\&\?\%=]*(?<!\.))*'
-        r'[\]\)\}]?)'
+        r'(?:[ \t]+[a-zA-Z0-9_\-\.\/\:<>=\"@\+\#\&\?\%]*[a-zA-Z0-9][a-zA-Z0-9_\-\.\/\:<>=\"@\+\#\&\?\%]*(?<!\.))*'
+    )
+    token_pattern = (
+        r'((?:'
+        + r'\(' + _CORE + r'\)'
+        + r'|\[' + _CORE + r'\]'
+        + r'|\{' + _CORE + r'\}'
+        + r'|' + _CORE
+        + r'))'
     )
     is_eng_pattern = (
-        r'^[\[\(\{]?'
-        r'[a-zA-Z0-9_\-\.\:\/\<\>\=\"@\+\#\&\?\%=]*[a-zA-Z0-9][a-zA-Z0-9_\-\.\:\/\<\>\=\"@\+\#\&\?\%=]*'
-        r'(?<!\.)'
-        r'(?:[ \t]+[a-zA-Z0-9_\-\.\:\/\<\>\=\"@\+\#\&\?\%=]*[a-zA-Z0-9][a-zA-Z0-9_\-\.\:\/\<\>\=\"@\+\#\&\?\%=]*(?<!\.))*'
-        r'[\]\)\}]?$'
+        r'^(?:'
+        + r'\(' + _CORE + r'\)'
+        + r'|\[' + _CORE + r'\]'
+        + r'|\{' + _CORE + r'\}'
+        + r'|' + _CORE
+        + r')$'
     )
 
     tokens = re.split(token_pattern, str(text))
