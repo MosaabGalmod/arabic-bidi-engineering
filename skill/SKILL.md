@@ -48,6 +48,12 @@ In all table implementations across all platforms (HTML/CSS, Word .docx, Excel .
 - **Hijri Dates**: Format Islamic dates using the Umm al-Qura calendar via the Intl API:
   `new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', ...)`
 - **Official Documents**: In formal reports and official documents, always pair the Hijri date with the Gregorian date (e.g., `1448/03/15 هـ (الموافق 2026/09/27 م)`).
+- **Ban on Native Browser Date Input in Arabic/RTL Interfaces**: The native `<input type="date">` element is **strictly prohibited** in any Arabic `(dir="rtl")` web interface. Browsers `(Chromium/Blink on Windows with ar-SA locale)` force the OS regional format, reversing field order (placing the year at the far right) and rendering Arabic-Indic digits `(٠٢/١٠/٢٠٢٦)` that cannot be overridden via CSS or JavaScript. This creates an unreadable, non-standard date display. **Mandatory replacement**: Use a Custom Segmented Date Control `(see dual-ui-core skill, Section 4.6)` with the following constraints:
+  1. **Explicit RTL visual order**: Day `DD` at the far right → separator `/` → Month `MM` in the center → separator `/` → Year `YYYY` at the far left.
+  2. **Western digits only** `(0-9)`: Consistent with banking, technical, and government digital standards. No Arabic-Indic digits in date fields.
+  3. **Hidden ISO sync field**: A hidden `<input type="hidden">` must synchronize the composed value in ISO 8601 format `(YYYY-MM-DD)` for server submission.
+  4. **Auto-advance focus**: After entering 2 digits in Day, focus auto-advances to Month; after 2 digits in Month, focus auto-advances to Year. Backspace on an empty segment returns focus to the previous segment.
+  5. **Integrated calendar popup**: A calendar button `(📅)` opens a visual date picker; selecting a date instantly populates all three segments and the hidden ISO field.
 
 ## 4. Routing Table: Domain-Specific References
 For deep technical patterns and complete code implementations, refer to the domain guides:
