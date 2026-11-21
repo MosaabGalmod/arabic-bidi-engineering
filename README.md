@@ -120,7 +120,7 @@ ln -s "$PWD/arabic-bidi-engineering/skill" ~/.claude/skills/arabic-bidi-engineer
 
 | المجلد أو الملف | المحتوى |
 | --- | --- |
-| <code dir="ltr">skill/</code> | الإصدار الحالي القابل للتثبيت <code dir="ltr">(v2.2.0)</code>، وهو المجلد الذي ترتبط به كل الوكلاء |
+| <code dir="ltr">skill/</code> | الإصدار الحالي القابل للتثبيت <code dir="ltr">(v2.1.0)</code>، وهو المجلد الذي ترتبط به كل الوكلاء |
 | `skill/SKILL.md` | الملف الأساسي: قواعد المحادثة، والقاعدة الجوهرية، وجدول التوجيه، وقائمة التحقق |
 | <code dir="ltr">skill/references/</code> | التفاصيل التقنية لكل مجال: `Word` و`Excel` و`HTML/PDF` ومعالجة النصوص |
 | `skill/scripts/check_arabic_text.py` | مدقق آلي لملفات `Markdown` و`HTML` و`Word` |
