@@ -66,7 +66,35 @@ For deep technical patterns and complete code implementations, refer to the doma
 | **Backend & Text** / Normalization, search indexing, slugify, JS Intl | [references/text-processing.md](references/text-processing.md) |
 | **Document BiDi Marks** / RLM & LRM usage in generated documents | [references/text-processing.md#5-punctuation--bidi-control-marks-in-generated-documents](references/text-processing.md#5-punctuation--bidi-control-marks-in-generated-documents) |
 
-## 5. Release Checklist
+## 5. Arabic/RTL Web UI: The 15-Point Rules
+Mandatory for every HTML, CSS, Tailwind, Vue, React or Blade interface. Setting `dir="rtl"` is not enough: apply all 15 rules, then run the Flip Test (5.2).
+
+| # | Rule | Do | Don't |
+| :-- | :-- | :-- | :-- |
+| 1 | Document direction on the root | `<html lang="ar" dir="rtl">`; bilingual apps switch `lang` and `dir` on `<html>` atomically | `dir` only on an inner `<div>` |
+| 2 | Logical margins and insets | `margin-inline-start/end`, `inset-inline-*`, `border-inline-*`; Tailwind `ms-* me-* ps-* pe-* start-* end-*` | `margin-left`, `ml-*`, `mr-*`, `left-*`, `right-*` |
+| 3 | Logical alignment and padding | `text-align: start/end`, `padding-inline-start`, `float: inline-start` | `text-align: left/right`, `padding-left` |
+| 4 | Mirror directional icons | arrows, back/forward, chevrons, next/previous, progress arrows: `[dir="rtl"] .icon-dir { scale: -1 1; }` | a "back" arrow still pointing right |
+| 5 | Never mirror neutral icons and marks | play/pause, clock, check, plus, media controls, brand logos, QR codes and barcodes | flipping a logo or the play button |
+| 6 | Directional motion and positioning | drawers, toasts and slide animations use a direction variable (`--dir: 1`, and `-1` under `[dir="rtl"]`, e.g. `translateX(calc(100% * var(--dir)))`) or logical `inset-inline-*`; carousels and `scrollLeft` handle RTL | hardcoded `translateX(100%)` |
+| 7 | Numbers keep LTR order | prices, dates, percentages and counters inside Arabic text use `unicode-bidi: isolate` (a `.num` class), Western digits, `Intl.NumberFormat('ar-SA-u-nu-latn')` | letting `1,250` or `15%` reorder |
+| 8 | Isolate Latin data | emails, phone numbers, URLs, IDs and code inside Arabic sentences are wrapped in `<bdi>` or `dir="ltr"` | a raw `+966 55...` inside an Arabic sentence |
+| 9 | Punctuation in mixed sentences | wrap the Latin run in `<bdi>`; use `dir="auto"` on user-generated blocks; Arabic marks `،` `؛` `؟` | a trailing `?` jumping to the wrong side |
+| 10 | No letter-spacing on Arabic | zero `letter-spacing` for `:lang(ar)`; tracking only on Latin via `:lang(en)` | `letter-spacing: .15em` on Arabic headings |
+| 11 | Arabic needs more line height | `:lang(ar)` body `line-height` at least 1.6 (long text 1.7 to 1.9), headings at least 1.3; no fixed heights that clip glyphs | reusing the Latin 1.4 |
+| 12 | Separate Arabic and Latin fonts | `:lang(ar)` and `:lang(en)` each get their own `font-family` stack; self-host; `font-display: swap` | one font for both scripts |
+| 13 | Direction on inputs | `dir="auto"` on free-text and mixed fields (name, search, comment, email, phone); `dir="ltr"` allowed for always-Latin values | forcing RTL on an email field |
+| 14 | Truncation | `text-overflow: ellipsis` follows the element's `direction`: verify the ellipsis lands on the end side; use `dir="auto"` on truncated mixed text | assuming the dots are correct |
+| 15 | Directional effects | shadows with an x-offset and gradients with a direction are mirrored in RTL (`--dir` variable or a `[dir="rtl"]` override); prefer symmetric shadows | `box-shadow: 14px 14px` in both directions |
+
+### 5.1 Automated guards
+- Add `stylelint-use-logical` (or an equivalent rule) to fail on physical properties, plus a lint or grep rule that fails on `letter-spacing` applied to Arabic and on Tailwind `ml-` `mr-` `pl-` `pr-` `left-` `right-` `text-left` `text-right`, unless a `/* rtl-exempt: reason */` comment justifies the exception.
+- Run an `axe` accessibility pass in both `ar` and `en`.
+
+### 5.2 The Flip Test (release gate)
+Open the page, flip `dir` on `<html>` (rtl to ltr and back) and compare screenshots at 390 px and 1280 px. Everything must mirror except the items in rule 5 and the Latin data in rules 7 and 8. Automate it with Playwright screenshot comparison where a test setup exists; otherwise inspect it manually for at least ten seconds.
+
+## 6. Release Checklist
 Before concluding any Arabic text, document generation, or UI task:
 - [ ] **Validator**: Run `python3 scripts/check_arabic_text.py <file>` to detect punctuation, direction anomalies, naked Latin words (`[NAKED_LATIN]`), or LTR line starts (`[LATIN_LINE_START]`).
 - [ ] **Chat/Markdown**: Follows Section 0 (backticks on code/Latin, native `،` `؛` `؟`, no invisible bidi marks).
@@ -76,3 +104,4 @@ Before concluding any Arabic text, document generation, or UI task:
 - [ ] **PDF/HTML**: Root has `<html lang="ar" dir="rtl">`, code blocks use `unicode-bidi: isolate;`, and layout uses CSS logical properties.
 - [ ] **Tables (All Formats)**: Text headers (`th`), descriptions, and narrative Arabic cells are explicitly right-aligned (never centered or left-aligned).
 - [ ] **Email**: Explicit `dir="rtl"` and `align="right"` attributes on `<table>` and `<td>` tags.
+- [ ] **Web UI**: all 15 rules of Section 5 pass and the Flip Test (5.2) was run.
